@@ -1,0 +1,26 @@
+# === CLion / JetBrains IDE Settings ===
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# === CMake & Build Directories ===
+# CLion generates these folders for different build profiles
+cmake-build-*/
+.cmake/
+
+# === Compiled Binaries & Object Files ===
+# Common outputs you don't want in Git
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.exe
+*.out
+*.app
+
+# === Operating System Junk ===
+.DS_Store
+Thumbs.db
