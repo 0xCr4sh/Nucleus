@@ -3,5 +3,5 @@ add_executable(Sandbox
 )
 
 target_link_libraries(Sandbox
-        PRIVATE Nucleus
+        PRIVATE NucleusGameEngine
 )

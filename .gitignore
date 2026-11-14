@@ -24,3 +24,6 @@ cmake-build-*/
 # === Operating System Junk ===
 .DS_Store
 Thumbs.db
+
+# Doxygen documentation
+docs/

@@ -1,18 +1,20 @@
-add_library(Nucleus SHARED)
-
-target_sources(Nucleus PRIVATE
-        src/Application.cpp
-        src/EntryPoint.cpp
+set(NUCLEUS_ENGINE_PUBLIC_API
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_include_directories(Nucleus
-        PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-
-        PRIVATE
+set(NUCLEUS_ENGINE_SRC_ROOT
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_definitions(Nucleus
-        PRIVATE NUCLEUS_BUILD
+add_subdirectory(src/core)
+add_subdirectory(src/platform)
+add_subdirectory(src/Engine)
+
+add_library(NucleusGameEngine INTERFACE)
+
+target_link_libraries(NucleusGameEngine
+        INTERFACE
+        NucleusCore
+        NucleusPlatform
+        NucleusEngine
 )

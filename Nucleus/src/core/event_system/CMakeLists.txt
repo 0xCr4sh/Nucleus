@@ -1,0 +1,14 @@
+target_sources(NucleusCore
+        PRIVATE
+        EventBus.cpp
+        EventNone.cpp
+        WindowCloseEvent.cpp
+        WindowResizeEvent.cpp
+        MouseScrolledEvent.cpp
+        MouseMovedEvent.cpp
+        MouseButtonReleasedEvent.cpp
+        MouseButtonPressedEvent.cpp
+        KeyRepeatedEvent.cpp
+        KeyReleasedEvent.cpp
+        KeyPressedEvent.cpp
+)

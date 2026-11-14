@@ -11,28 +11,39 @@
  * @copyright (c) 2026
  */
 
-#include <print>
-#include <Nucleus/Application.hpp>
+#include <nucleus/nucleus.h>
 
-class Game : public Nucleus::Application
-{
-public:
-    Game() {
-        std::print("Game started\n");
-    }
-    ~Game() override {
-        std::print("Game destroyed\n");
-    }
 
-    void Run() override {
-        std::print("Game running\n");
-    }
-};
+namespace {
+    class Game : public nucleus::Application
+    {
+    public:
+        Game() : Application({
+            .WindowWidth    = 800,
+            .WindowHeight   = 600,
+            .WindowTitle    = "Nucleus-Sandbox",
+            .Vsync          = true
+        }) {
+            NUC_TRACE("Entered Game");
+        }
+        ~Game() override {
+            NUC_TRACE("Exited Game");
+        }
 
-Nucleus::Application *Nucleus::CreateApplication() {
+        void OnCreate() override {
+            NUC_TRACE("Created Game");
+        }
+
+        void OpUpdate() override {
+
+        }
+    };
+}
+
+nucleus::Application *nucleus::CreateApplication() {
     return new Game();
 }
 
-void Nucleus::DestroyApplication(Application *app) {
+void nucleus::DestroyApplication(Application *app) {
     delete app;
 }

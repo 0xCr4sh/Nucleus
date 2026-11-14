@@ -1,6 +1,6 @@
 
 /**
- * @file Export.hpp
+ * @file Export.h
  * @brief Defines platform, compiler and shared library export macros.
  *
  * @details
@@ -37,8 +37,8 @@
  * @copyright (c) 2026 Ridham
  */
 
-#ifndef NUCLEUS_EXPORT_HPP
-#define NUCLEUS_EXPORT_HPP
+#ifndef NUCLEUS_EXPORT_H
+#define NUCLEUS_EXPORT_H
 
 
 /* ============================================================
