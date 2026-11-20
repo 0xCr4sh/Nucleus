@@ -18,15 +18,10 @@
 #include <platform/platform.h>
 #include <platform/window.h>
 #include <memory>
-#include <nucleus/core/application.h>
-
+#include <nucleus/Engine/application.h>
+#include <nucleus/Engine/EngineContext.h>
 
 namespace nucleus {
-    struct EngineContext {
-        EventBus eventbus;
-        std::unique_ptr<IPlatform> platform   = nullptr;
-        std::unique_ptr<IWindow> window       = nullptr;
-    };
 
     class EngineRuntime final {
 
@@ -38,12 +33,15 @@ namespace nucleus {
         void Run();
         void Shutdown();
 
-        constexpr const EngineContext& GetContext();
+        EngineContext GetContext() const;
 
     private:
         void TransferEventToBus(IEvent& e);
 
-        EngineContext m_Context;
+        EventBus m_EventBus;
+        std::unique_ptr<IPlatform> m_Platform   = nullptr;
+        std::unique_ptr<IWindow> m_Window       = nullptr;
+
         Application* m_Application = nullptr;
         bool m_IsTerminated = false;
         bool m_IsRunning = false;

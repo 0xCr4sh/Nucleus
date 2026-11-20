@@ -33,8 +33,10 @@
 #ifndef NUCLEUS_APPLICATION_H
 #define NUCLEUS_APPLICATION_H
 
-#include "../export.h"
-#include "../types/numericalAliases.h"
+#include <nucleus/export.h>
+#include <nucleus/types/numericalAliases.h>
+#include <nucleus/Engine/Layers/LayerStack.h>
+#include "EngineContext.h"
 #include <string>
 
 namespace nucleus {
@@ -65,11 +67,15 @@ namespace nucleus {
     class NUCLEUS_API Application {
     public:
 
-        explicit Application(const ApplicationHints& hints)
+        Application(const ApplicationHints& hints = {})
             : m_Hints(hints) {}
 
         constexpr const ApplicationHints& GetHints() {
             return m_Hints;
+        }
+
+        void SetContext(const EngineContext& ctx) {
+            m_Context = ctx;
         }
 
         /**
@@ -82,13 +88,18 @@ namespace nucleus {
          */
         virtual ~Application() = default;
 
-        virtual void OnCreate() = 0;
+        virtual void OnCreate() {}
 
-        virtual void OpUpdate() = 0;
+        virtual void OnShutdown() {}
+
+        virtual void OnUpdate() {}
+
+        virtual void OnRender() {}
 
     protected:
         ApplicationHints m_Hints;
-
+        EngineContext m_Context;
+        LayerStack m_LayerStack;
     };
 
 
@@ -125,5 +136,15 @@ namespace nucleus {
      */
     void DestroyApplication(Application* app);
 } // namespace Nucleus
+
+
+#define SET_NUCLEUS_APPLICATION(x) \
+    ::nucleus::Application* ::nucleus::CreateApplication() { \
+        return new x();\
+    } \
+    \
+    void ::nucleus::DestroyApplication(Application* app) { \
+        delete app;\
+    }
 
 #endif // NUCLEUS_APPLICATION_H

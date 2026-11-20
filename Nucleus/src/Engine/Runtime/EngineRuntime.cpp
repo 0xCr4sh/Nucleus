@@ -12,7 +12,6 @@
  */
 
 #include "EngineRuntime.h"
-#include <nucleus/core/application.h>
 #include <core/logging/LogInternal.h>
 
 #include <core/event_system/Events.h>
@@ -24,68 +23,68 @@ namespace nucleus {
         {
             case EventType::None:
             {
-                m_Context.eventbus.Publish<EventNone>(static_cast<EventNone&>(e));
+                m_EventBus.Publish<EventNone>(static_cast<EventNone&>(e));
                 break;
             }
 
             case EventType::WindowClose:
             {
-                m_Context.eventbus.Publish<WindowCloseEvent>(static_cast<WindowCloseEvent&>(e));
+                m_EventBus.Publish<WindowCloseEvent>(static_cast<WindowCloseEvent&>(e));
                 break;
             }
 
             case EventType::WindowResize:
             {
-                m_Context.eventbus.Publish<WindowResizeEvent>(static_cast<WindowResizeEvent&>(e));
+                m_EventBus.Publish<WindowResizeEvent>(static_cast<WindowResizeEvent&>(e));
                 break;
             }
 
             case EventType::KeyPressed:
             {
-                m_Context.eventbus.Publish<KeyPressedEvent>(static_cast<KeyPressedEvent&>(e));
+                m_EventBus.Publish<KeyPressedEvent>(static_cast<KeyPressedEvent&>(e));
                 break;
             }
 
             case EventType::KeyReleased:
             {
-                m_Context.eventbus.Publish<KeyReleasedEvent>(static_cast<KeyReleasedEvent&>(e));
+                m_EventBus.Publish<KeyReleasedEvent>(static_cast<KeyReleasedEvent&>(e));
                 break;
             }
 
             case EventType::KeyRepeated:
             {
-                m_Context.eventbus.Publish<KeyRepeatedEvent>(static_cast<KeyRepeatedEvent&>(e));
+                m_EventBus.Publish<KeyRepeatedEvent>(static_cast<KeyRepeatedEvent&>(e));
                 break;
             }
 
             case EventType::MouseButtonPressed:
             {
-                m_Context.eventbus.Publish<MouseButtonPressedEvent>(static_cast<MouseButtonPressedEvent&>(e));
+                m_EventBus.Publish<MouseButtonPressedEvent>(static_cast<MouseButtonPressedEvent&>(e));
                 break;
             }
 
             case EventType::MouseButtonReleased:
             {
-                m_Context.eventbus.Publish<MouseButtonReleasedEvent>(static_cast<MouseButtonReleasedEvent&>(e));
+                m_EventBus.Publish<MouseButtonReleasedEvent>(static_cast<MouseButtonReleasedEvent&>(e));
                 break;
             }
 
             case EventType::MouseMoved:
             {
-                m_Context.eventbus.Publish<MouseMovedEvent>(static_cast<MouseMovedEvent&>(e));
+                m_EventBus.Publish<MouseMovedEvent>(static_cast<MouseMovedEvent&>(e));
                 break;
             }
 
             case EventType::MouseScrolled:
             {
-                m_Context.eventbus.Publish<MouseScrolledEvent>(static_cast<MouseScrolledEvent&>(e));
+                m_EventBus.Publish<MouseScrolledEvent>(static_cast<MouseScrolledEvent&>(e));
                 break;
             }
 
             default:
             {
                 NUC_CORE_WARN("Unknown event type received: {}", e.GetName());
-                m_Context.eventbus.Publish<IEvent>(e);
+                m_EventBus.Publish<IEvent>(e);
             }
         }
     }
@@ -99,27 +98,29 @@ namespace nucleus {
     void EngineRuntime::Init() {
         LogInternal::Init();
 
-        m_Context.platform  = IPlatform::Create();
+        m_Platform  = IPlatform::Create();
 
         m_Application = CreateApplication();
 
-        m_Context.window = m_Context.platform->CreateWindow({
+        m_Window = m_Platform->CreateWindow({
             .width  = m_Application->GetHints().WindowWidth,
             .height = m_Application->GetHints().WindowHeight,
             .title  = m_Application->GetHints().WindowTitle,
             .vsync  = m_Application->GetHints().Vsync
         });
 
-        m_Context.window->SetEventCallback([this](IEvent& e) {
+        m_Window->SetEventCallback([this](IEvent& e) {
             TransferEventToBus(e);
         });
 
-        m_Application->OnCreate();
-
-        m_Context.eventbus.Subscribe<WindowCloseEvent>([&](WindowCloseEvent& e) {
+        m_EventBus.Subscribe<WindowCloseEvent>([&](WindowCloseEvent& e) {
             m_IsRunning = false;
             e.handled = true;
         }, EventPriority::Engine);
+
+        m_Application->OnCreate();
+
+        m_Application->SetContext(GetContext());
 
         m_IsRunning = true;
     }
@@ -127,11 +128,12 @@ namespace nucleus {
     void EngineRuntime::Run() {
 
         while (m_IsRunning) {
-            m_Context.platform->PollEvents();
+            m_Platform->PollEvents();
 
-            m_Application->OpUpdate();
+            m_Application->OnUpdate();
+            m_Application->OnRender();
 
-            m_Context.window->SwapBuffers();
+            m_Window->SwapBuffers();
         }
 
     }
@@ -142,15 +144,17 @@ namespace nucleus {
         DestroyApplication(m_Application);
         m_Application = nullptr;
 
-        m_Context.window->Close();
-        m_Context.window = nullptr;
+        m_Window->Close();
+        m_Window = nullptr;
 
         LogInternal::Shutdown();
 
         m_IsTerminated = true;
     }
 
-    constexpr const EngineContext &EngineRuntime::GetContext() {
-        return m_Context;
+    EngineContext EngineRuntime::GetContext() const {
+        return {
+            .eventbus = &m_EventBus,
+        };
     }
 } // nucleus

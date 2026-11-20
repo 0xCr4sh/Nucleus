@@ -26,7 +26,7 @@
 #ifndef NUCLEUS_H
 #define NUCLEUS_H
 
-#include "core/application.h"
+#include "Engine/application.h"
 #include "core/log.h"
 #include "core/event_system/eventbus.h"
 #include "core/event_system/event.h"

@@ -10,6 +10,7 @@ target_include_directories(NucleusEngine
 )
 
 add_subdirectory(Runtime)
+add_subdirectory(Layer)
 
 if(MSVC)
     target_compile_options(NucleusEngine PRIVATE /W4 /permissive-)
@@ -17,13 +18,11 @@ else()
     target_compile_options(NucleusEngine PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-#target_precompile_headers(NucleusEngine PRIVATE
-#        <vector>
-#        <string>
-#        <unordered_map>
-#        <spdlog/spdlog.h>
-#        <spdlog/sinks/stdout_color_sinks.h>
-#)
+target_precompile_headers(NucleusEngine PRIVATE
+        <vector>
+        <memory>
+        <algorithm>
+)
 
 target_sources(NucleusEngine
         PRIVATE

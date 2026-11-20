@@ -13,37 +13,43 @@
 
 #include <nucleus/nucleus.h>
 
+#include "nucleus/Engine/Layers/Layer.h"
 
 namespace {
-    class Game : public nucleus::Application
+    class GameplayLayer final : public nucleus::Layer {
+    public:
+        GameplayLayer() : Layer(Type::REGULAR) {}
+
+        void OnAttach() override {
+            NUC_TRACE("Created GameplayLayer {}", static_cast<void*>(this));
+        }
+
+        void OnDetach() override {
+            NUC_TRACE("Deleted GameplayLayer {}", static_cast<void*>(this));
+        }
+    };
+
+    class Game final : public nucleus::Application
     {
     public:
-        Game() : Application({
-            .WindowWidth    = 800,
-            .WindowHeight   = 600,
-            .WindowTitle    = "Nucleus-Sandbox",
-            .Vsync          = true
-        }) {
-            NUC_TRACE("Entered Game");
-        }
-        ~Game() override {
-            NUC_TRACE("Exited Game");
-        }
-
         void OnCreate() override {
             NUC_TRACE("Created Game");
+            m_LayerStack.Push(std::make_unique<GameplayLayer>());
         }
 
-        void OpUpdate() override {
+        void OnShutdown() override {
+            NUC_TRACE("Shutting Down Game");
+        }
+
+        void OnUpdate() override {
 
         }
+
+        void OnRender() override {
+
+        }
+
     };
 }
 
-nucleus::Application *nucleus::CreateApplication() {
-    return new Game();
-}
-
-void nucleus::DestroyApplication(Application *app) {
-    delete app;
-}
+SET_NUCLEUS_APPLICATION(Game);
